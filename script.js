@@ -4,28 +4,28 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             const products = parseCSV(data);
             renderCatalog(products);
-        })
-        .catch(error => console.error('Error al cargar el archivo CSV:', error));
+        });
 });
 
 function parseCSV(data) {
-    const lines = data.split('\n').filter(line => line.trim() !== ''); // Ignorar líneas vacías
-    const headers = lines[0].split(','); 
+    const lines = data.split('\n');
+    const headers = lines[0].split(','); // Cambiado a ',' porque CSV típicamente usa comas
     const products = [];
 
     for (let i = 1; i < lines.length; i++) {
-        const line = parseCSVLine(lines[i]);
-        if (line.length === headers.length) {
+        const line = lines[i].split(',');
+        if (line.length === headers.length) { // Asegurarse de que la línea tenga el número correcto de columnas
             const product = {};
             for (let j = 0; j < headers.length; j++) {
                 product[headers[j].trim()] = line[j] ? line[j].trim() : '';
             }
-            if (product.Nombre) {
+            if (product.Nombre) { // Asegurarse de que el producto tenga un nombre
                 products.push(product);
             }
         }
     }
 
+    // Ordenar productos por nombre
     products.sort((a, b) => {
         const isSpecialA = isSpecialEsmalte(a.Nombre);
         const isSpecialB = isSpecialEsmalte(b.Nombre);
@@ -46,34 +46,12 @@ function parseCSV(data) {
     return products;
 }
 
-function parseCSVLine(line) {
-    const result = [];
-    let insideQuotes = false;
-    let value = '';
-
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        
-        if (char === '"') {
-            insideQuotes = !insideQuotes;
-        } else if (char === ',' && !insideQuotes) {
-            result.push(value);
-            value = '';
-        } else {
-            value += char;
-        }
-    }
-    result.push(value);
-
-    return result;
-}
-
 function renderCatalog(products) {
     const catalog = document.getElementById('catalog');
     const categories = {};
 
     products.forEach(product => {
-        const categoryKey = getCategoryKey(product.Categoría); 
+        const categoryKey = getCategoryKey(product.Categoría); // Usar la columna 'Categoría'
         if (!categories[categoryKey]) {
             categories[categoryKey] = [];
         }
@@ -89,7 +67,7 @@ function renderCatalog(products) {
         while (pageIndex < categoryProducts.length) {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'category';
-            categoryDiv.innerHTML = `<h2>${category}</h2>`; 
+            categoryDiv.innerHTML = `<h2>${category}</h2>`; // Título basado en la categoría
 
             const pageProducts = categoryProducts.slice(pageIndex, pageIndex + 16);
             pageProducts.forEach(product => {
@@ -113,18 +91,29 @@ function renderCatalog(products) {
 }
 
 function isSpecialEsmalte(productName) {
+    if (typeof productName !== 'string') {
+        return false; // Si el nombre no es una cadena, no es un esmalte especial
+    }
     return productName.includes('Esmalte permanente Wemmi Hema Free') && /\d+/.test(productName);
 }
 
 function extractDigits(productName) {
     const matches = productName.match(/\d+/g);
-    return matches ? parseInt(matches[0]) : Infinity;
+    if (matches) {
+        return parseInt(matches[0]);
+    } else {
+        return Infinity;
+    }
 }
 
 function getCategoryKey(categoryName) {
-    if (typeof categoryName !== 'string' || categoryName.trim() === '') {
-        return 'Uncategorized';
+    if (typeof categoryName !== 'string') {
+        return 'Uncategorized'; // Manejo de categorías no definidas o incorrectas
     }
     const words = categoryName.split(' ');
-    return words.length >= 2 ? `${words[0]}_${words[1]}` : categoryName;
+    if (words.length >= 2) {
+        return `${words[0]}_${words[1]}`;
+    } else {
+        return categoryName;
+    }
 }
