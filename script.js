@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function parseCSV(data) {
     const lines = data.split('\n');
-    const headers = lines[0].split(','); // Cambiado a ',' porque CSV típicamente usa comas
+    const headers = lines[0].split(';'); // Cambiado a ';' porque el CSV usa punto y coma
     const products = [];
 
     for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].split(',');
+        const line = lines[i].split(';');
         if (line.length === headers.length) { // Asegurarse de que la línea tenga el número correcto de columnas
             const product = {};
             for (let j = 0; j < headers.length; j++) {
@@ -77,8 +77,6 @@ function renderCatalog(products) {
                     <img src="${product['Imagen URL']}" alt="${product.Nombre}">
                     <div class="product-name">${product.Nombre}</div>
                     <div class="product-ref">${product.Referencia}</div>
-                    <div class="product-price">${product.Precio} USD</div> 
-                    <div class="product-quantity">Cantidad: ${product.Cantidad}</div>
                 `;
                 categoryDiv.appendChild(productDiv);
             });
