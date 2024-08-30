@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.text())
         .then(data => {
             const products = parseCSV(data);
-            renderCatalog(products);
+            const filteredProducts = filterProducts(products); // Filtrar productos
+            renderCatalog(filteredProducts);
         });
 });
 
@@ -26,24 +27,17 @@ function parseCSV(data) {
     }
 
     // Ordenar productos por nombre
-    products.sort((a, b) => {
-        const isSpecialA = isSpecialEsmalte(a.Nombre);
-        const isSpecialB = isSpecialEsmalte(b.Nombre);
-
-        if (isSpecialA && isSpecialB) {
-            const digitsA = extractDigits(a.Nombre);
-            const digitsB = extractDigits(b.Nombre);
-            return digitsA - digitsB;
-        } else if (isSpecialA) {
-            return -1;
-        } else if (isSpecialB) {
-            return 1;
-        } else {
-            return a.Nombre.localeCompare(b.Nombre);
-        }
-    });
+    products.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
 
     return products;
+}
+
+function filterProducts(products) {
+    // Filtrar solo los productos que contienen "esmalte" o "tinte" en el nombre (ignorando mayúsculas/minúsculas)
+    return products.filter(product => {
+        const lowerCaseName = product.Nombre.toLowerCase();
+        return lowerCaseName.includes('esmalte') || lowerCaseName.includes('tinte');
+    });
 }
 
 function renderCatalog(products) {
@@ -85,22 +79,6 @@ function renderCatalog(products) {
             pageNumber++;
             pageIndex += 16;
         }
-    }
-}
-
-function isSpecialEsmalte(productName) {
-    if (typeof productName !== 'string') {
-        return false; // Si el nombre no es una cadena, no es un esmalte especial
-    }
-    return productName.includes('Esmalte permanente Wemmi Hema Free') && /\d+/.test(productName);
-}
-
-function extractDigits(productName) {
-    const matches = productName.match(/\d+/g);
-    if (matches) {
-        return parseInt(matches[0]);
-    } else {
-        return Infinity;
     }
 }
 
