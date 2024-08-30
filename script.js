@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             const products = parseCSV(data);
             const filteredProducts = filterProducts(products); // Filtrar productos
-            renderCatalog(filteredProducts);
+            const sortedProducts = sortProducts(filteredProducts); // Ordenar esmaltes y tintes
+            renderCatalog(sortedProducts);
         });
 });
 
@@ -26,9 +27,6 @@ function parseCSV(data) {
         }
     }
 
-    // Ordenar productos por nombre
-    products.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-
     return products;
 }
 
@@ -38,6 +36,28 @@ function filterProducts(products) {
         const lowerCaseName = product.Nombre.toLowerCase();
         return lowerCaseName.includes('esmalte') || lowerCaseName.includes('tinte');
     });
+}
+
+function sortProducts(products) {
+    // Separar productos en esmaltes y tintes
+    const esmaltes = [];
+    const tintes = [];
+    
+    products.forEach(product => {
+        const lowerCaseName = product.Nombre.toLowerCase();
+        if (lowerCaseName.includes('esmalte')) {
+            esmaltes.push(product);
+        } else if (lowerCaseName.includes('tinte')) {
+            tintes.push(product);
+        }
+    });
+
+    // Ordenar ambos grupos por nombre
+    esmaltes.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+    tintes.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
+
+    // Concatenar esmaltes primero y luego tintes
+    return esmaltes.concat(tintes);
 }
 
 function renderCatalog(products) {
