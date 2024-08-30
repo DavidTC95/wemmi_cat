@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+#catalog {
+    width: 210mm; /* A4 width */
+    margin: auto;
+    page-break-after: always; /* Forzar salto de página después de cada página */
+}
+
+.category {
+    width: 100%;
+    padding: 10px;
+    background-color: #f2f2f2;
+    margin-bottom: 20px; /* Espacio entre categorías */
+    page-break-inside: avoid; /* Evitar que una categoría se divida entre páginas */
+    box-sizing: border-box;
+}
+
+.product {
+    width: calc((210mm - 30px) / 4); /* Calcula el ancho para 4 productos por fila con espacio */
+    height: auto; /* Ajustar la altura automáticamente según el contenido */
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    padding: 10px;
+    margin: 0;
+    float: left; /* Permitir que los productos se alineen en una cuadrícula */
+    text-align: center; /* Alinear contenido al centro */
+    overflow: hidden; /* Evitar desbordamiento */
+}
+
+.product img {
+    width: 100%; /* Hacer que la imagen ocupe todo el ancho del contenedor */
+    height: auto; /* Ajustar la altura automáticamente según el ancho */
+    display: block; /* Asegura que la imagen se ajuste correctamente */
+    margin-bottom: 5px; /* Espacio opcional bajo la imagen */
+}
+
+.product-name, .product-ref {
+    font-size: 12px;
+    margin: 5px 0;
+}
